@@ -18,8 +18,11 @@
   },
   "homepage": "https://github.com/chrisjalf/expensum_node#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "express": "^4.17.3",
+    "helmet": "^5.0.2",
     "mysql2": "^2.3.3",
+    "nocache": "^3.0.3",
     "nodemon": "^2.0.15",
     "sequelize": "^6.17.0",
     "sequelize-cli": "^6.4.1"
