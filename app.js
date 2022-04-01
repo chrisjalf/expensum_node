@@ -2,6 +2,7 @@ require('./global_function');
 
 const express = require('express');
 const app = express();
+const passport = require('passport');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const nocache = require('nocache');
@@ -28,6 +29,8 @@ app.use((req, res, next) => {
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
+app.use(passport.initialize());
 
 const authRouter = require('./routes/auth');
 

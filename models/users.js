@@ -48,7 +48,7 @@ module.exports = (sequelize, DataTypes) => {
   users.prototype.getJwt = function() {
     const expirationTime = '1h';
     const token = jwt.sign(
-      { consumer_id: this.consumer_id },
+      { id: this.id },
       'this1sUserToken',
       { expiresIn: expirationTime }
     );
