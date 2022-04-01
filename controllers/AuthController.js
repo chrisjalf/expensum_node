@@ -14,3 +14,26 @@ module.exports.register = async (req, res) => {
 
     return ReE(res, 'Unable to register', 400);
 }
+
+module.exports.login = async (req, res) => {
+    const body = Keyfilter(req.body, ['email', 'password']);
+
+    if (body.email && body.password) {
+        return Users.findOne({ 
+            where: { email: body.email }
+        }).then(user => {
+            if (user) {
+                return bcrypt.compare(body.password, user.password).then(match => {
+                    if (match)
+                        return ReS(res, '', { user: user.toWeb(), token: user.getJwt() });
+                });
+            }
+                
+            throw 'Email and password combination does not exist';
+        }).catch(err => {
+            return ReE(res, err, 400);
+        });
+    }
+
+    return ReE(res, 'Unable to login', 400);
+}
