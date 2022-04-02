@@ -21,5 +21,6 @@ router.post('/register', UserController.register);
 router.post('/login', UserController.login);
 router.post('/categories', AuthMiddleware, UserController.categories);
 router.post('/category/:id', AuthMiddleware, UserController.category);
+router.post('/transactions', AuthMiddleware, UserController.transactions);
 
 module.exports = router;

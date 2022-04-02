@@ -1,5 +1,6 @@
 'use strict';
 const { Model } = require('sequelize');
+const moment = require('moment');
 
 module.exports = (sequelize, DataTypes) => {
   class transactions extends Model {
@@ -10,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.cat_id = this.belongsTo(models.categories, { foreignKey: 'cat_id' });
     }
   }
 
