@@ -1,4 +1,5 @@
 const Users = require('../models').users;
+const Categories = require('../models').categories;
 const bcrypt = require('bcryptjs');
 
 module.exports.register = async (req, res) => {
@@ -36,4 +37,23 @@ module.exports.login = async (req, res) => {
     }
 
     return ReE(res, 'Unable to login', 400);
+}
+
+module.exports.categories = async (req, res) => {
+    Categories.findAll().then(categories => {
+        return ReS(res, '', { categories: categories });
+    }).catch(err => {
+        return ReE(res, err, 400);
+    });
+}
+
+module.exports.category = async (req, res) => {
+    Categories.findOne({ where: { id: req.params.id } }).then(category => {
+        if (category)
+            return ReS(res, '', { category: category });
+
+        throw 'Category not found';
+    }).catch(err => {
+        return ReE(res, err, 400);
+    });
 }

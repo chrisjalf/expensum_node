@@ -19,6 +19,7 @@ AuthMiddleware = (req, res, next) => {
 
 router.post('/register', UserController.register);
 router.post('/login', UserController.login);
-router.post('/test', AuthMiddleware, (req, res) => { return ReS(res, '', { id: req.user.id }); });
+router.post('/categories', AuthMiddleware, UserController.categories);
+router.post('/category/:id', AuthMiddleware, UserController.category);
 
 module.exports = router;
