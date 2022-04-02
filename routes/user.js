@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 
-const AuthController = require('../controllers/AuthController');
+const UserController = require('../controllers/UserController');
 
 AuthMiddleware = (req, res, next) => {
     require('../middleware/passport').UserAuth(passport);
@@ -17,8 +17,8 @@ AuthMiddleware = (req, res, next) => {
     })(req, res, next);
 }
 
-router.post('/register', AuthController.register);
-router.post('/login', AuthController.login);
+router.post('/register', UserController.register);
+router.post('/login', UserController.login);
 router.post('/test', AuthMiddleware, (req, res) => { return ReS(res, '', { id: req.user.id }); });
 
 module.exports = router;

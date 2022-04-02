@@ -32,9 +32,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(passport.initialize());
 
-const authRouter = require('./routes/auth');
+const userRouter = require('./routes/user');
 
-app.use('/', authRouter);
+app.use('/', userRouter);
 
 const port = 3000;
 app.listen(port, () => console.log(`Server listening on port ${port}`));
