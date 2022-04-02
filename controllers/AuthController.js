@@ -8,7 +8,7 @@ module.exports.register = async (req, res) => {
         body.password = bcrypt.hashSync(body.password);
 
         return Users.create(body).then(user => {
-            return ReS(res, 'User registered', { user: user });
+            return ReS(res, 'User registered', { user: user.toWeb() });
         });
     }
 

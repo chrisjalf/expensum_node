@@ -7,10 +7,10 @@ const AuthController = require('../controllers/AuthController');
 AuthMiddleware = (req, res, next) => {
     require('../middleware/passport').UserAuth(passport);
 
-    passport.authenticate('jwt', (err, user) => {
+    passport.authenticate('jwt', (err, user, info) => {
         if (!user)
-            return ReE(res, err, 401);
-        
+            return ReE(res, info?.message ? info.message : err, 401);
+
         req.user = user;
 
         return next();
