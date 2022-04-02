@@ -1,9 +1,8 @@
 'use strict';
 const { Model } = require('sequelize');
-const moment = require('moment');
 
 module.exports = (sequelize, DataTypes) => {
-  class categories extends Model {
+  class transactions extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -14,8 +13,19 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
 
-  categories.init({
-    name: DataTypes.STRING,
+  transactions.init({
+    user_id: DataTypes.INTEGER,
+    cat_id: DataTypes.INTEGER,
+    description: DataTypes.STRING,
+    type: DataTypes.STRING,
+    amount: DataTypes.DECIMAL,
+    trans_date: {
+      type: DataTypes.DATE,
+      get() {
+        const c = this.getDataValue('trans_date');
+        return c ? moment(c).format('YYYY-MM-DD HH:mm:ss') : null;
+      }
+    },
     createdAt: {
       type: DataTypes.DATE,
       get() {
@@ -32,8 +42,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {
     sequelize,
-    modelName: 'categories',
+    modelName: 'transactions',
   });
 
-  return categories;
+  return transactions;
 }
