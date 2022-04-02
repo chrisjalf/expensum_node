@@ -1,10 +1,8 @@
 'use strict';
 const { Model } = require('sequelize');
-const jwt = require('jsonwebtoken');
-const moment = require('moment');
 
 module.exports = (sequelize, DataTypes) => {
-  class users extends Model {
+  class transactions extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -15,10 +13,19 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
 
-  users.init({
-    name: DataTypes.STRING,
-    email: DataTypes.STRING,
-    password: DataTypes.STRING,
+  transactions.init({
+    user_id: DataTypes.INTEGER,
+    cat_id: DataTypes.INTEGER,
+    description: DataTypes.STRING,
+    type: DataTypes.STRING,
+    amount: DataTypes.DECIMAL,
+    trans_date: {
+      type: DataTypes.DATE,
+      get() {
+        const c = this.getDataValue('trans_date');
+        return c ? moment(c).format('YYYY-MM-DD HH:mm:ss') : null;
+      }
+    },
     createdAt: {
       type: DataTypes.DATE,
       get() {
@@ -35,26 +42,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {
     sequelize,
-    modelName: 'users'
+    modelName: 'transactions',
   });
 
-  users.prototype.toWeb = function() {
-    let json = this.toJSON();
-    delete json['password'];
-
-    return json;
-  }
-
-  users.prototype.getJwt = function() {
-    const expirationTime = '1h';
-    const token = jwt.sign(
-      { id: this.id },
-      'this1sUserToken',
-      { expiresIn: expirationTime }
-    );
-
-    return `Bearer ${token}`;
-  }
-
-  return users;
+  return transactions;
 }

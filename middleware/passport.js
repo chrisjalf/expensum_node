@@ -9,13 +9,13 @@ module.exports.UserAuth = passport => {
     };
 
     passport.use(new JwtStrategy(opts, async (jwt_payload, done) => {
-        if (jwt_payload?.id) {
-            Users.findByPk(jwt_payload.id).then(user => {
-                if (user)
-                    return done(null, user);
-                
-                throw 'User not found';
-            }).catch(err => { return done(err, false); });
-        }
+        Users.findByPk(jwt_payload.id).then(user => {
+            if (user)
+                return done(null, user);
+            
+            throw 'User not found';
+        }).catch(err => {
+            return done(err, false);
+        });
     }));
 }
