@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const { checkSchema, validationResult } = require('express-validator');
 
 const Users = require('../models').users;
 const Categories = require('../models').categories;
@@ -87,4 +88,48 @@ module.exports.transaction = async (req, res) => {
     }).catch(err => {
         return ReE(res, err, 400);
     });
+}
+
+module.exports.test = async (req, res) => {
+    await checkSchema({
+        name: {
+            notEmpty: true,
+            errorMessage: 'Name is required',
+            isLength: {
+                options: { min: 5 },
+                errorMessage: 'Name must be at least 5 characters'
+            }
+        },
+        password: {
+            notEmpty: true,
+            errorMessage: 'Password is required',
+            isLength: {
+                options: { min: 10 },
+                errorMessage: 'Password must be at least 10 characters'
+            }
+        }
+    }).run(req);
+
+    const errors = validationResult(req);
+
+    /**
+     * Sample errors.array() content
+     *  [
+            {
+                "msg": "Name is required",
+                "param": "name",
+                "location": "body"
+            },
+            {
+                "msg": "Password is required",
+                "param": "password",
+                "location": "body"
+            }
+        ]
+     */
+
+    if (!errors.isEmpty())
+        return ReE(res, errors.array()[0].msg, 400);
+
+    return ReS(res, 'Yay', 200);
 }

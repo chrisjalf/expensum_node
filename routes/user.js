@@ -23,5 +23,6 @@ router.post('/categories', AuthMiddleware, UserController.categories);
 router.post('/category/:id', AuthMiddleware, UserController.category);
 router.post('/transactions', AuthMiddleware, UserController.transactions);
 router.post('/transaction/:id', AuthMiddleware, UserController.transaction);
+router.post('/test', UserController.test);
 
 module.exports = router;
