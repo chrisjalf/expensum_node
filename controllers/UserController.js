@@ -1,5 +1,4 @@
 const bcrypt = require('bcryptjs');
-const sequelize = require('../models').sequelize;
 
 const Users = require('../models').users;
 const Categories = require('../models').categories;
@@ -65,11 +64,26 @@ module.exports.transactions = async (req, res) => {
     Transactions.findAll({
         where: { user_id: req.user.id },
         include: [{
-            model: Categories,
-            attributes: ['name']
+            model: Categories
         }]
     }).then(transactions => {
         return ReS(res, '', { transactions: transactions, count: transactions.length });
+    }).catch(err => {
+        return ReE(res, err, 400);
+    });
+}
+
+module.exports.transaction = async (req, res) => {
+    Transactions.findOne({
+        where: { id: req.params.id },
+        include: [{
+            model: Categories
+        }]
+    }).then(transaction => {
+        if (transaction)
+            return ReS(res, '', { transaction: transaction });
+
+        throw 'Transaction not found';
     }).catch(err => {
         return ReE(res, err, 400);
     });
