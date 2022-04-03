@@ -6,17 +6,41 @@ const Categories = require('../models').categories;
 const Transactions = require('../models').transactions;
 
 module.exports.register = async (req, res) => {
+    await checkSchema({
+        name: {
+            notEmpty: true,
+            errorMessage: 'Name is required'
+        },
+        email: {
+            notEmpty: true,
+            errorMessage: 'Email is required',
+            isEmail: {
+                errorMessage: 'Valid email format is required'
+            }
+        },
+        password: {
+            notEmpty: true,
+            errorMessage: 'Password is required',
+            isLength: {
+                options: { min: 8, max: 32 },
+                errorMessage: 'Password must be between 8 and 32 characters'
+            }
+        }
+    }).run(req);
+
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty())
+        return ReE(res, errors.array()[0].msg, 400);
+
     const body = Keyfilter(req.body, ['name', 'email', 'password']);
-    
-    if (body.name && body.email && body.password) {
-        body.password = bcrypt.hashSync(body.password);
+    body.password = bcrypt.hashSync(body.password);
 
-        return Users.create(body).then(user => {
-            return ReS(res, 'User registered', { user: user.toWeb() });
-        });
-    }
-
-    return ReE(res, 'Unable to register', 400);
+    Users.create(body).then(user => {
+        return ReS(res, 'User registered', { user: user.toWeb() });
+    }).catch(err => {
+        return ReE(res, err, 400);
+    });
 }
 
 module.exports.login = async (req, res) => {
