@@ -44,26 +44,45 @@ module.exports.register = async (req, res) => {
 }
 
 module.exports.login = async (req, res) => {
+    await checkSchema({
+        email: {
+            notEmpty: true,
+            errorMessage: 'Email is required',
+            isEmail: {
+                errorMessage: 'Valid email format is required'
+            }
+        },
+        password: {
+            notEmpty: true,
+            errorMessage: 'Password is required',
+            isLength: {
+                options: { min: 8, max: 32 },
+                errorMessage: 'Password must be between 8 and 32 characters'
+            }
+        }
+    }).run(req);
+
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty())
+        return ReE(res, errors.array()[0].msg, 400);
+
     const body = Keyfilter(req.body, ['email', 'password']);
 
-    if (body.email && body.password) {
-        return Users.findOne({ 
-            where: { email: body.email }
-        }).then(user => {
-            if (user) {
-                return bcrypt.compare(body.password, user.password).then(match => {
-                    if (match)
-                        return ReS(res, '', { user: user.toWeb(), token: user.getJwt() });
-                });
-            }
-                
-            throw 'Email and password combination does not exist';
-        }).catch(err => {
-            return ReE(res, err, 400);
-        });
-    }
-
-    return ReE(res, 'Unable to login', 400);
+    Users.findOne({ 
+        where: { email: body.email }
+    }).then(user => {
+        if (user) {
+            return bcrypt.compare(body.password, user.password).then(match => {
+                if (match)
+                    return ReS(res, '', { user: user.toWeb(), token: user.getJwt() });
+            });
+        }
+            
+        throw 'Email and password combination does not exist';
+    }).catch(err => {
+        return ReE(res, err, 400);
+    });
 }
 
 module.exports.categories = async (req, res) => {
