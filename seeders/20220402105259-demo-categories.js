@@ -37,6 +37,11 @@ module.exports = {
         name: 'Savings & Investments',
         createdAt: new Date(),
         updatedAt: new Date()
+      },
+      {
+        name: 'Clothing',
+        createdAt: new Date(),
+        updatedAt: new Date()
       }
     ]);
   },
