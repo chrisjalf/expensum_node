@@ -6,6 +6,7 @@ const passport = require('passport');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const nocache = require('nocache');
+const createError = require('http-errors');
 
 const models = require("./models");
 const env = process.env.NODE_ENV || 'development';
@@ -35,6 +36,14 @@ app.use(passport.initialize());
 const userRouter = require('./routes/user');
 
 app.use('/', userRouter);
+
+app.use((req, res, next) => {
+    next(createError(404));
+});
+
+app.use((err, req, res, next) => {
+    return ReE(res, err, err.status || 500);
+});
 
 const port = 3000;
 app.listen(port, () => console.log(`Server listening on port ${port}`));
