@@ -72,15 +72,19 @@ module.exports.login = async (req, res) => {
 
     Users.findOne({ 
         where: { email: body.email }
-    }).then(user => {
+    }).then(async user => {
+        let authorized = false;
+
         if (user) {
-            return bcrypt.compare(body.password, user.password).then(match => {
-                if (match)
-                    return ReS(res, '', { user: user.toWeb(), token: user.getJwt() });
+            authorized = await bcrypt.compare(body.password, user.password).then(match => {
+                return match;
             });
         }
-            
-        throw 'Email and password combination does not exist';
+        
+        if (!user || !authorized)
+            throw 'Email and password combination does not exist';
+        else
+            return ReS(res, '', { user: user.toWeb(), token: user.getJwt() });
     }).catch(err => {
         return ReE(res, err, 400);
     });
