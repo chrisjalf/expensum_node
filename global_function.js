@@ -35,3 +35,7 @@ Keyfilter = function (body, filterkey) {
 
     return filtered;
 }
+
+FlagTruthy = function(c) {
+	return (typeof c == "boolean" && c) || (typeof c == "string" && (parseInt(c) == c && parseInt(c) == 1) || c === "true");
+}

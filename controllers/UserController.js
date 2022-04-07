@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const moment = require('moment');
+const sequelize = require('sequelize');
 const { checkSchema, validationResult } = require('express-validator');
 
 const Users = require('../models').users;
@@ -110,8 +111,17 @@ module.exports.category = async (req, res) => {
 }
 
 module.exports.transactions = async (req, res) => {
+    const body = Keyfilter(req.body, ['current_month']);
+    let conditions = {};
+
+    if (FlagTruthy(body.current_month)) {
+        const startOfMonth = moment().startOf('month').format('YYYY-MM-DD 00:00:00');
+        const endOfMonth = moment().endOf('month').format('YYYY-MM-DD 23:59:59');
+        conditions.trans_date = { [sequelize.Op.between]: [startOfMonth, endOfMonth] };
+    }
+
     Transactions.findAll({
-        where: { user_id: req.user.id },
+        where: { user_id: req.user.id, ...conditions },
         include: [{
             model: Categories
         }]
