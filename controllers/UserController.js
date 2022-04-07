@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const moment = require('moment');
+const sequelize = require('sequelize');
 const { checkSchema, validationResult } = require('express-validator');
 
 const Users = require('../models').users;
@@ -110,13 +111,46 @@ module.exports.category = async (req, res) => {
 }
 
 module.exports.transactions = async (req, res) => {
+    const body = Keyfilter(req.body, ['current_month']);
+    let conditions = {}, misc = {};
+
+    if (FlagTruthy(body.current_month)) {
+        const startOfMonth = moment().startOf('month').format('YYYY-MM-DD 00:00:00');
+        const endOfMonth = moment().endOf('month').format('YYYY-MM-DD 23:59:59');
+        conditions.trans_date = { [sequelize.Op.between]: [startOfMonth, endOfMonth] };
+    }
+
     Transactions.findAll({
-        where: { user_id: req.user.id },
+        where: { user_id: req.user.id, ...conditions },
         include: [{
             model: Categories
         }]
-    }).then(transactions => {
-        return ReS(res, '', { transactions: transactions, count: transactions.length });
+    }).then(async transactions => {
+        if (conditions.trans_date) {
+            let incomes = [], expenses = [];
+
+            transactions.forEach(trans => {
+                if (trans.type === 'Add')
+                    incomes.push(+trans.amount);
+                else
+                    expenses.push(+trans.amount);
+            });
+
+            const sumOfAmountByType = await Transactions.findAll({
+                where: { user_id: req.user.id },
+                attributes: ['type', [sequelize.fn('sum', sequelize.col('amount')), 'total']],
+                group: ['type'],
+                raw: true
+            });
+            const amount_type = sumOfAmountByType.reduce((obj, item) => (obj[item.type === 'Add' ? 'income' : 'expense'] = item.total, obj), {});
+            const balance = parseFloat(amount_type.income) - parseFloat(amount_type.expense);
+
+            misc.income = incomes.reduce((a, b) => parseFloat(a) + parseFloat(b), 0).toFixed(2);
+            misc.expense = expenses.reduce((a, b) => parseFloat(a) + parseFloat(b), 0).toFixed(2);
+            misc.balance = balance < 0 ? `- $${Math.abs(balance).toFixed(2)}` : `$${balance.toFixed(2)}`;
+        }
+
+        return ReS(res, '', { transactions: transactions, count: transactions.length, ...misc });
     }).catch(err => {
         return ReE(res, err, 400);
     });
