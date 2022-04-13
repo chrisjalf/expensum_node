@@ -111,7 +111,7 @@ module.exports.category = async (req, res) => {
 }
 
 module.exports.transactions = async (req, res) => {
-    const body = Keyfilter(req.body, ['current_month']);
+    const body = Keyfilter(req.body, ['current_month', 'cat_id']);
     let conditions = {}, misc = {};
 
     if (FlagTruthy(body.current_month)) {
@@ -119,6 +119,9 @@ module.exports.transactions = async (req, res) => {
         const endOfMonth = moment().endOf('month').format('YYYY-MM-DD 23:59:59');
         conditions.trans_date = { [sequelize.Op.between]: [startOfMonth, endOfMonth] };
     }
+
+    if (body.cat_id)
+        conditions.cat_id = body.cat_id
 
     Transactions.findAll({
         where: { user_id: req.user.id, ...conditions },
