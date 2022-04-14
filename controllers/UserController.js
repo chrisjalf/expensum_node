@@ -175,7 +175,7 @@ module.exports.transaction = async (req, res) => {
     });
 }
 
-module.exports.transactionCreate = async (req, res) => {
+module.exports.transactionAdd = async (req, res) => {
     await checkSchema({
         cat_id: {
             notEmpty: true,
@@ -236,7 +236,7 @@ module.exports.transactionCreate = async (req, res) => {
         user_id: req.user.id,
         ...body
     }).then(transaction => {
-        return ReS(res, 'Transaction created', { transaction: transaction });
+        return ReS(res, 'Transaction added', { transaction: transaction });
     }).catch(err => {
         return ReE(res, err, 400);
     });
