@@ -20,7 +20,13 @@ module.exports = (sequelize, DataTypes) => {
     cat_id: DataTypes.INTEGER,
     description: DataTypes.STRING,
     type: DataTypes.STRING,
-    amount: DataTypes.DECIMAL,
+    amount: {
+      type: DataTypes.DECIMAL,
+      get() {
+        const c = this.getDataValue('amount');
+        return typeof c === 'number' ? c.toFixed(2) : c;
+      }
+    },
     trans_date: {
       type: DataTypes.DATE,
       get() {

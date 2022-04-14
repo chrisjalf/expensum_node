@@ -179,7 +179,7 @@ module.exports.transactionAdd = async (req, res) => {
     await checkSchema({
         cat_id: {
             notEmpty: true,
-            errorMessage: 'Category ID is required',
+            errorMessage: 'Category is required',
             custom: {
                 options: value => {
                     return Categories.findOne({
