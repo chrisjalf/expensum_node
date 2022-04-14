@@ -127,7 +127,8 @@ module.exports.transactions = async (req, res) => {
         where: { user_id: req.user.id, ...conditions },
         include: [{
             model: Categories
-        }]
+        }],
+        order: [['id', 'DESC']]
     }).then(async transactions => {
         if (conditions.trans_date) {
             let incomes = [], expenses = [];
